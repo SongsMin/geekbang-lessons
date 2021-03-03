@@ -7,6 +7,7 @@ import org.geektimes.projects.user.sql.DBConnectionManager;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.*;
@@ -65,8 +66,11 @@ public class DatabaseUserRepository implements UserRepository {
     public User getByNameAndPassword(String userName, String password) {
         return executeQuery("SELECT id,name,password,email,phoneNumber FROM users WHERE name=? and password=?",
                 resultSet -> {
-                    // TODO
-                    return new User();
+                    BeanInfo userBeanInfo = Introspector.getBeanInfo(User.class, Object.class);
+                    if (resultSet.next()) {
+                        return getUser(resultSet, userBeanInfo);
+                    }
+                    return null;
                 }, COMMON_EXCEPTION_HANDLER, userName, password);
     }
 
@@ -77,28 +81,32 @@ public class DatabaseUserRepository implements UserRepository {
             BeanInfo userBeanInfo = Introspector.getBeanInfo(User.class, Object.class);
             List<User> users = new ArrayList<>();
             while (resultSet.next()) { // 如果存在并且游标滚动 // SQLException
-                User user = new User();
-                for (PropertyDescriptor propertyDescriptor : userBeanInfo.getPropertyDescriptors()) {
-                    String fieldName = propertyDescriptor.getName();
-                    Class fieldType = propertyDescriptor.getPropertyType();
-                    String methodName = resultSetMethodMappings.get(fieldType);
-                    // 可能存在映射关系（不过此处是相等的）
-                    String columnLabel = mapColumnLabel(fieldName);
-                    Method resultSetMethod = ResultSet.class.getMethod(methodName, String.class);
-                    // 通过放射调用 getXXX(String) 方法
-                    Object resultValue = resultSetMethod.invoke(resultSet, columnLabel);
-                    // 获取 User 类 Setter方法
-                    // PropertyDescriptor ReadMethod 等于 Getter 方法
-                    // PropertyDescriptor WriteMethod 等于 Setter 方法
-                    Method setterMethodFromUser = propertyDescriptor.getWriteMethod();
-                    // 以 id 为例，  user.setId(resultSet.getLong("id"));
-                    setterMethodFromUser.invoke(user, resultValue);
-                }
+                User user = getUser(resultSet, userBeanInfo);
+                users.add(user);
             }
             return users;
-        }, e -> {
-            // 异常处理
-        });
+        }, COMMON_EXCEPTION_HANDLER);
+    }
+
+    private User getUser(ResultSet resultSet, BeanInfo userBeanInfo) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        User user = new User();
+        for (PropertyDescriptor propertyDescriptor : userBeanInfo.getPropertyDescriptors()) {
+            String fieldName = propertyDescriptor.getName();
+            Class fieldType = propertyDescriptor.getPropertyType();
+            String methodName = resultSetMethodMappings.get(fieldType);
+            // 可能存在映射关系（不过此处是相等的）
+            String columnLabel = mapColumnLabel(fieldName);
+            Method resultSetMethod = ResultSet.class.getMethod(methodName, String.class);
+            // 通过放射调用 getXXX(String) 方法
+            Object resultValue = resultSetMethod.invoke(resultSet, columnLabel);
+            // 获取 User 类 Setter方法
+            // PropertyDescriptor ReadMethod 等于 Getter 方法
+            // PropertyDescriptor WriteMethod 等于 Setter 方法
+            Method setterMethodFromUser = propertyDescriptor.getWriteMethod();
+            // 以 id 为例，  user.setId(resultSet.getLong("id"));
+            setterMethodFromUser.invoke(user, resultValue);
+        }
+        return user;
     }
 
     /**
@@ -124,8 +132,8 @@ public class DatabaseUserRepository implements UserRepository {
 
                 // Boolean -> boolean
                 String methodName = preparedStatementMethodMappings.get(argType);
-                Method method = PreparedStatement.class.getMethod(methodName, wrapperType);
-                method.invoke(preparedStatement, i + 1, args);
+                Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
+                method.invoke(preparedStatement, i + 1, arg);
             }
             ResultSet resultSet = preparedStatement.executeQuery();
             // 返回一个 POJO List -> ResultSet -> POJO List
