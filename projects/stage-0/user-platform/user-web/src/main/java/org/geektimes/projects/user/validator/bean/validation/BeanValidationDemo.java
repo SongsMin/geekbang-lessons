@@ -17,6 +17,8 @@ public class BeanValidationDemo {
 
         User user = new User();
         user.setPassword("***");
+        user.setEmail("a.qq.com");
+        user.setPhoneNumber("1330303030a");
 
         // 校验结果
         Set<ConstraintViolation<User>> violations = validator.validate(user);

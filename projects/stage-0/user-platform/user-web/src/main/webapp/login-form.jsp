@@ -22,12 +22,15 @@
 	<div class="container">
 		<form class="form-signin">
 			<h1 class="h3 mb-3 font-weight-normal">登录</h1>
-			<label for="inputEmail" class="sr-only">请输入电子邮件</label> <input
+			<label for="inputEmail" class="sr-only">电子邮件</label> <input
 				type="email" id="inputEmail" class="form-control"
-				placeholder="请输入电子邮件" required autofocus> <label
-				for="inputPassword" class="sr-only">Password</label> <input
+				placeholder="请输入电子邮件" required autofocus>
+			<label for="inputPassword" class="sr-only">Password</label> <input
 				type="password" id="inputPassword" class="form-control"
 				placeholder="请输入密码" required>
+			<label for="inputPhoneNumber" class="sr-only">电话</label><input
+				type="number" id="inputPhoneNumber" class="form-control"
+				placeholder="请输入电话号码" required>
 			<div class="checkbox mb-3">
 				<label> <input type="checkbox" value="remember-me">
 					Remember me

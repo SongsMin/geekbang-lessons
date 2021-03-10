@@ -31,7 +31,7 @@ public class JpaDemo {
         user.setName("小马哥");
         user.setPassword("******");
         user.setEmail("mercyblitz@gmail.com");
-        user.setPhoneNumber("123456789");
+        user.setPhoneNumber("12345678910");
         EntityTransaction transaction = entityManager.getTransaction();
         transaction.begin();
         entityManager.persist(user);
@@ -50,7 +50,7 @@ public class JpaDemo {
 
     private static DataSource getDataSource() {
         EmbeddedDataSource dataSource = new EmbeddedDataSource();
-        dataSource.setDatabaseName("/db/user-platform");
+        dataSource.setDatabaseName("db/user-platform");
         dataSource.setCreateDatabase("create");
         return dataSource;
     }

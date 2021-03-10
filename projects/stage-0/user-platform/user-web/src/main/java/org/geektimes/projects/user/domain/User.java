@@ -10,6 +10,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -26,15 +27,16 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = AUTO)
-    @NotNull
+//    @NotNull
     private Long id;
 
     @Column
     private String name;
 
     @Column
-    @Max(32)
-    @Min(6)
+//    @Max(32)
+//    @Min(6)
+    @Size(min = 6, max = 32)
     private String password;
 
     @Column
@@ -43,7 +45,7 @@ public class User implements Serializable {
 
     @Column
 //    @Size(min = 11, max = 11, message = "请输入11位电话号码")
-    @Pattern(regexp = "^[0-9]{11}$", message = "请输入11位电话号码")
+    @Pattern(regexp = "^[0-9]{11}$", message = "请输入11位有效电话号码")
     private String phoneNumber;
 
     public Long getId() {
