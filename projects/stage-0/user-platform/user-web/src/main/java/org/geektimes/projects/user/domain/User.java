@@ -1,9 +1,15 @@
 package org.geektimes.projects.user.domain;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -32,9 +38,12 @@ public class User implements Serializable {
     private String password;
 
     @Column
+    @Email
     private String email;
 
     @Column
+//    @Size(min = 11, max = 11, message = "请输入11位电话号码")
+    @Pattern(regexp = "^[0-9]{11}$", message = "请输入11位电话号码")
     private String phoneNumber;
 
     public Long getId() {
