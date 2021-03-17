@@ -15,6 +15,25 @@ public class JavaConfig implements Config {
      */
     private List<ConfigSource> configSources = new LinkedList<>();
 
+    private static Map<Class<?>, Converter> converters = new HashMap<>();
+    static {
+        converters.put(Boolean.class, Boolean::valueOf);
+        converters.put(boolean.class, Boolean::parseBoolean);
+        converters.put(Byte.class, Byte::valueOf);
+        converters.put(byte.class, Byte::parseByte);
+        converters.put(Short.class, Short::valueOf);
+        converters.put(short.class, Short::parseShort);
+        converters.put(Integer.class, Integer::valueOf);
+        converters.put(int.class, Integer::parseInt);
+        converters.put(Long.class, Long::valueOf);
+        converters.put(long.class, Long::parseLong);
+        converters.put(Float.class, Float::valueOf);
+        converters.put(float.class, Float::parseFloat);
+        converters.put(Double.class, Double::valueOf);
+        converters.put(double.class, Double::parseDouble);
+        converters.put(String.class, str -> str);
+    }
+
     private static Comparator<ConfigSource> configSourceComparator = new Comparator<ConfigSource>() {
         @Override
         public int compare(ConfigSource o1, ConfigSource o2) {
@@ -71,7 +90,8 @@ public class JavaConfig implements Config {
 
     @Override
     public <T> Optional<Converter<T>> getConverter(Class<T> forType) {
-        return Optional.empty();
+//        return Optional.empty();
+        return Optional.ofNullable(converters.get(forType));
     }
 
     @Override
